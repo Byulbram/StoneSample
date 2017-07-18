@@ -31,12 +31,10 @@ public class StoneManager : MonoBehaviour {
 
     public void Initialize()
     {
-        UpdateConsole("Start initialize");
+        UpdateConsole("Start Stone SDK initialize");
         string ApplicationPath = Application.dataPath;
-#if UNITY_EDITOR
-#else
         ApplicationPath += "/../";
-#endif
+        
         UpdateConsole(ApplicationPath);
         E_InitResult_CS eRet = SnailLauncher_CS.LoadLibraries(ApplicationPath);
 
@@ -44,14 +42,14 @@ public class StoneManager : MonoBehaviour {
         
         if (eRet != E_InitResult_CS.OK)
         {
-            UpdateConsole("Load STONE SDK Fail");
+            UpdateConsole("Load STONE SDK Failed: " + eRet);
         }
         else
         {
             bool bRet = SnailLauncher_CS.GetLauncher();
             if (bRet == true)
             {
-                UpdateConsole("Get Launver OK");
+                UpdateConsole("Get Launcher OK");
             }
             else
             {
