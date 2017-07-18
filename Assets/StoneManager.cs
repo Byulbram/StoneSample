@@ -18,11 +18,31 @@ public class StoneManager : MonoBehaviour {
     {
         SM = this;
         ConsoleText.Append(Console.text);
-        UpdateConsole("Program Started");
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        //UpdateConsole("Program Started");
+
+        UpdateConsole("Start Stone SDK initialize");
+
+        //Get Unity Application Path. 
+        //SnailLauncherSDK.dll, SnailLauncherSDK_Proxy_C.dll should be at Project folder in Editor and exe folder at build.
+        string ApplicationPath = Application.dataPath;
+        ApplicationPath += "/../";
+
+        UpdateConsole(ApplicationPath);
+        E_InitResult_CS eRet = SnailLauncher_CS.LoadLibraries(ApplicationPath);
+
+        if (eRet != E_InitResult_CS.OK)
+        {
+            UpdateConsole("Load STONE SDK Failed: " + eRet); // returns error code
+        }
+        else
+        {
+            UpdateConsole("Load STONE SDK Success!");
+        }
+
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
 	    	
 	}
@@ -34,24 +54,9 @@ public class StoneManager : MonoBehaviour {
         Console.text = ConsoleText.ToString();
     } 
 
-    public void Initialize()
+    public void GetLauncher()
     {
-        UpdateConsole("Start Stone SDK initialize");
-
-        //Get Unity Application Path. 
-        //SnailLauncherSDK.dll, SnailLauncherSDK_Proxy_C.dll should be at Project folder in Editor and exe folder at build.
-        string ApplicationPath = Application.dataPath;
-        ApplicationPath += "/../";
-        
-        UpdateConsole(ApplicationPath);
-        E_InitResult_CS eRet = SnailLauncher_CS.LoadLibraries(ApplicationPath);
-
-        
-        if (eRet != E_InitResult_CS.OK)
-        {
-            UpdateConsole("Load STONE SDK Failed: " + eRet); // returns error code
-        }
-        else
+        if (SnailLauncher_CS.IsLibrariesLoaded())
         {
             bool bRet = SnailLauncher_CS.GetLauncher();
             if (bRet == true)
@@ -63,11 +68,20 @@ public class StoneManager : MonoBehaviour {
                 UpdateConsole("Get Launcher Failed");
             }
         }
+        else
+        {
+            UpdateConsole("Libraries Not Initialized");
+        }
     }
 
     public void LaunchClientInterface()
     {
-        UpdateConsole("Start LaunchClientInterface");
+        if (SnailLauncher_CS.IsLibrariesLoaded() != true)
+        {
+            UpdateConsole("Libraries Not Initialized");
+            return;
+        }
+        UpdateConsole("Start StartLauncherW");
         E_StartLauncher_Result_CS startResult = SnailLauncher_CS.StartLauncherW("The Silver Bullet: Prometheus", 30171, null);
         if (startResult == 0)
         {
@@ -82,6 +96,11 @@ public class StoneManager : MonoBehaviour {
 
     public void GetServiceTicketSync()
     {
+        if (SnailLauncher_CS.IsLibrariesLoaded() != true)
+        {
+            UpdateConsole("Libraries Not Initialized");
+            return;
+        }
         UpdateConsole("Start GetServiceTicketSync");
         int iErrCode = 0;
         SnailLauncherSDK_CS.StServiceTicketInfo_CS stTemp = SnailLauncher_CS.GetServiceTicket_Sync(ref iErrCode);
@@ -90,6 +109,11 @@ public class StoneManager : MonoBehaviour {
 
     public void GetServiceTicketASync()
     {
+        if (SnailLauncher_CS.IsLibrariesLoaded() != true)
+        {
+            UpdateConsole("Libraries Not Initialized");
+            return;
+        }
         UpdateConsole("Start GetServiceTicketASync");
         E_SdkCodeError_CS retVal = SnailLauncher_CS.GetServiceTicket_ASync(onServiceTicketCallback);
         UpdateConsole("Result : " + retVal);
@@ -103,6 +127,11 @@ public class StoneManager : MonoBehaviour {
 
     public void RegisterStatusCheck()
     {
+        if (SnailLauncher_CS.IsLibrariesLoaded() != true)
+        {
+            UpdateConsole("Libraries Not Initialized");
+            return;
+        }
         UpdateConsole("Start RegisterStatusCheck");
         E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterStatusCheckCallback(OnStatusCheckCallback);
         UpdateConsole("Result : " + retVal);
@@ -110,6 +139,7 @@ public class StoneManager : MonoBehaviour {
 
     private static void OnStatusCheckCallback(EStatusCheck_CS status)
     {
+        SM.UpdateConsole("OnStatusCheckCallback Started");
         switch (status)
         {
             case EStatusCheck_CS.SUCCESS: SM.UpdateConsole("OnStatusCheckCallback, status is ESuccess ."); break;
@@ -125,6 +155,11 @@ public class StoneManager : MonoBehaviour {
 
     public void RegisterAntiAddiction()
     {
+        if (SnailLauncher_CS.IsLibrariesLoaded() != true)
+        {
+            UpdateConsole("Libraries Not Initialized");
+            return;
+        }
         UpdateConsole("Start RegisterAntiAddiction");
         E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterAntiAddictionCallback(OnAntiAddictionCallback); SnailLauncher_CS.ReportPlayTheGameTimeReachCycle(10);
         UpdateConsole("Result : " + retVal);
@@ -133,6 +168,7 @@ public class StoneManager : MonoBehaviour {
 
     private static void OnAntiAddictionCallback(S_AntiAddiction_CS antiAddiction)
     {
+        SM.UpdateConsole("OnAntiAddictionCallback Started");
         switch (antiAddiction.type)
         {
             case E_AntiAddiction_CS.OK:
