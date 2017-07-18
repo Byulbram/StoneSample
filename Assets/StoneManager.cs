@@ -9,14 +9,14 @@ using System.Text;
 using SnailLauncherSDK_CS; //if This line got error, check SnailLauncherSDK_Proxy_CS.dll's target. one for x86, other for x86_x64
 
 public class StoneManager : MonoBehaviour {
-    public static StoneManager SM;
+    public static StoneManager one;
     public Text Console;    
     private StringBuilder ConsoleText = new StringBuilder();
 
     // Use this for initialization
     void Start ()
     {
-        SM = this;
+        one = this;
         ConsoleText.Append(Console.text);
         UpdateConsole("Start Stone SDK initialize");
 
@@ -68,7 +68,7 @@ public class StoneManager : MonoBehaviour {
         }
     }
 
-    public void LaunchClientInterface()
+    public void StartLauncher()
     {
         if (SnailLauncher_CS.IsLibrariesLoaded() == false)
         {
@@ -110,15 +110,17 @@ public class StoneManager : MonoBehaviour {
             return;
         }
         UpdateConsole("Start GetServiceTicketASync");
+        //ServiceTicket_Proxy_CS myCallBack = new ServiceTicket_Proxy_CS(onServiceTicketCallback);
+        //E_SdkCodeError_CS retVal = SnailLauncher_CS.GetServiceTicket_ASync(myCallBack);
         E_SdkCodeError_CS retVal = SnailLauncher_CS.GetServiceTicket_ASync(onServiceTicketCallback);
         UpdateConsole("Result : " + retVal);
     }
 
     private static void onServiceTicketCallback(StServiceTicketInfo_CS ticket, E_SdkCodeError_CS error)
     {
-        SM.UpdateConsole("onServiceTicketCallback Started");
+        one.UpdateConsole("onServiceTicketCallback Started");
         string strServiceTicket = System.Text.Encoding.Default.GetString(ticket.szServiceTicket);
-        SM.UpdateConsole(strServiceTicket.ToString());
+        one.UpdateConsole(strServiceTicket.ToString());
     }
 
     public void RegisterStatusCheck()
@@ -129,23 +131,25 @@ public class StoneManager : MonoBehaviour {
             return;
         }
         UpdateConsole("Start RegisterStatusCheck");
+        //StatusCheck_Proxy_CS myCallBack = new StatusCheck_Proxy_CS(OnStatusCheckCallback);
+        //E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterStatusCheckCallback(myCallBack);
         E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterStatusCheckCallback(OnStatusCheckCallback);
         UpdateConsole("Result : " + retVal);
     }
 
     private static void OnStatusCheckCallback(EStatusCheck_CS status)
     {
-        SM.UpdateConsole("OnStatusCheckCallback Started");
+        one.UpdateConsole("OnStatusCheckCallback Started");
         switch (status)
         {
-            case EStatusCheck_CS.SUCCESS: SM.UpdateConsole("OnStatusCheckCallback, status is ESuccess ."); break;
+            case EStatusCheck_CS.SUCCESS: one.UpdateConsole("OnStatusCheckCallback, status is ESuccess ."); break;
 
-            case EStatusCheck_CS.ERROR: SM.UpdateConsole("OnStatusCheckCallback, status is EError ."); break;
+            case EStatusCheck_CS.ERROR: one.UpdateConsole("OnStatusCheckCallback, status is EError ."); break;
 
-            case EStatusCheck_CS.EXIT: SM.UpdateConsole("OnStatusCheckCallback, status is EExit ."); break;
+            case EStatusCheck_CS.EXIT: one.UpdateConsole("OnStatusCheckCallback, status is EExit ."); break;
 
             default:
-                SM.UpdateConsole("OnStatusCheckCallback , status is UnKnown !"); break;
+                one.UpdateConsole("OnStatusCheckCallback , status is UnKnown !"); break;
         }
     }
 
@@ -157,42 +161,45 @@ public class StoneManager : MonoBehaviour {
             return;
         }
         UpdateConsole("Start RegisterAntiAddiction");
-        E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterAntiAddictionCallback(OnAntiAddictionCallback); SnailLauncher_CS.ReportPlayTheGameTimeReachCycle(10);
+        //AntiAddiction_Proxy_CS myCallBack = new AntiAddiction_Proxy_CS(OnAntiAddictionCallback);
+        //E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterAntiAddictionCallback(myCallBack);
+        E_SdkCodeError_CS retVal = SnailLauncher_CS.RegisterAntiAddictionCallback(OnAntiAddictionCallback);
+        SnailLauncher_CS.ReportPlayTheGameTimeReachCycle(1);
         UpdateConsole("Result : " + retVal);
     }
 
 
     private static void OnAntiAddictionCallback(S_AntiAddiction_CS antiAddiction)
     {
-        SM.UpdateConsole("OnAntiAddictionCallback Started");
+        one.UpdateConsole("OnAntiAddictionCallback Started");
         switch (antiAddiction.type)
         {
             case E_AntiAddiction_CS.OK:
                 //SnailLauncher_CS.Shutdown();
                 //TerminateApp();
-                SM.UpdateConsole("OnAntiAddictionCallback, Non anti-addiction account(EAntiAddictionOK).");
+                one.UpdateConsole("OnAntiAddictionCallback, Non anti-addiction account(EAntiAddictionOK).");
                 break;
             case E_AntiAddiction_CS.A_FORCE_GAME_END:
-                SM.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time  reach(EAntiAddictionForceGameEnd).");
+                one.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time  reach(EAntiAddictionForceGameEnd).");
                 break;
 
             case E_AntiAddiction_CS.A_180_Minutes:
-                SM.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	180  minutes(E AntiAddiction180Minutes).");
+                one.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	180  minutes(E AntiAddiction180Minutes).");
                 break;
 
             case E_AntiAddiction_CS.A_120_Minutes:
-                SM.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	120  minutes(E AntiAddiction120Minutes).");
+                one.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	120  minutes(E AntiAddiction120Minutes).");
                 break;
 
             case E_AntiAddiction_CS.A_60_Minutes:
-                SM.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	60  minutes(EA ntiAddiction60Minutes).");
+                one.UpdateConsole("OnAntiAddictionCallback,  anti-addiction  game  play  time	60  minutes(EA ntiAddiction60Minutes).");
                 break;
 
             case E_AntiAddiction_CS.A_PLAY_GAME:
-                SM.UpdateConsole("OnAntiAddictionCallback,anti-addiction is EAntiAddictionPlayGame ."); break;
+                one.UpdateConsole("OnAntiAddictionCallback,anti-addiction is EAntiAddictionPlayGame ."); break;
 
             default:
-                SM.UpdateConsole("OnAntiAddictionCallback, antiAddiction.type is UnKnown !"); break;
+                one.UpdateConsole("OnAntiAddictionCallback, antiAddiction.type is UnKnown !"); break;
         }
     }
 
